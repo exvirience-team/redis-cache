@@ -1,5 +1,6 @@
 const Redis = require('ioredis');
 const express = require('express');
+const cors = require('cors');
 
 // Create a new Redis instance
 const redis = new Redis({
@@ -10,7 +11,7 @@ const redis = new Redis({
 const app = express();
 
 // Middleware to parse JSON bodies
-app.use(express.json());
+app.use(express.json(), cors());
 
 // Function to set data in cache
 async function setData(key, value) {
@@ -36,7 +37,7 @@ app.get('/cache/get/:key', async (req, res) => {
   res.json(data);
 });
 
-// Endpoint to print "Hello, world!"s
+// Endpoint to print "Hello, world!"
 app.get('/cache/check', (req, res) => {
   res.send('Hello, world!');
 });
@@ -51,4 +52,3 @@ const PORT = 5001;
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
-

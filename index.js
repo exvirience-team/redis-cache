@@ -150,8 +150,8 @@ const handleSetRequest = async (event) => {
       content = await redis.set(key, data);
       console.log('Cache hit with content: ', content);
 
-      const chunkData = await getAsync(key);
-      console.log('Get data: ', chunkData);
+      // const chunkData = await getAsync(key);
+      // console.log('Get data: ', chunkData);
 
       return {
         statusCode: 200,
@@ -210,25 +210,8 @@ const handleGetRequest = async (event) => {
     }
 
     try {
-      let cursor = '0';
-      let keys = [];
-      do {
-          // Use the SCAN command to find keys that match the filename pattern
-          const reply = await scanAsync(cursor, 'MATCH', `${key}*`, 'COUNT', 100);
-          cursor = reply[0]; // Update cursor position for next scan
-          keys = keys.concat(reply[1]); // Concatenate keys from this scan batch
-      } while (cursor !== '0'); // Continue scanning until cursor returns to 0
-  
-      // Sort keys to ensure they are in the correct order, assuming keys end with the chunk number
-      keys.sort((a, b) => parseInt(a.split(key)[1]) - parseInt(b.split(key)[1]));
-  
-      console.log('Keys: ', keys)
-      // Retrieve and concatenate all chunks
-      let fileData = '';
-      for (const key of keys) {
-          const chunkData = await getAsync(key);
-          fileData += chunkData;
-      }
+      fileData = await redis.get(key);
+      console.log('Cache hit with content: ', fileData);
 
       // Try to get the content from Redis cache
       if (fileData) {
